@@ -11,6 +11,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.crypto.bcrypt.BCrypt;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -20,12 +22,15 @@ public class DipendenteService {
     @Autowired
     private DipendenteRepository dipendenteRepository;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     public Dipendente save(DipendenteDTO body) {
         Dipendente dipendente = new Dipendente();
         dipendente.setNome(body.nome());
         dipendente.setCognome(body.cognome());
         dipendente.setEmail(body.email());
-        dipendente.setUsername(body.username());
+        dipendente.setUsername(passwordEncoder.encode(body.username()));
         return dipendenteRepository.save(dipendente);
     }
 

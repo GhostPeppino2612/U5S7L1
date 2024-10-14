@@ -33,4 +33,9 @@ public class JWTools {
         }
 
     }
+
+    public String extractSubject(String token) {
+        return Jwts.parser().verifyWith(Keys.hmacShaKeyFor(secret.getBytes())).build().parseSignedClaims(token)
+                .getPayload().getSubject();
+    }
 }

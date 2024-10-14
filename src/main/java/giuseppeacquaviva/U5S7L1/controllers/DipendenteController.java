@@ -7,6 +7,8 @@ import giuseppeacquaviva.U5S7L1.services.DipendenteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -27,6 +29,22 @@ public class DipendenteController {
         return dipendenteService.getDipendenti(page, size, sortBy);
     }
 
+    @GetMapping("/me")
+    public Dipendente getProfile(@AuthenticationPrincipal Dipendente dipendente) {
+        return dipendente;
+    }
+
+    @PutMapping("/me")
+    public Dipendente updateProfile(@AuthenticationPrincipal Dipendente dipendente, @RequestBody DipendenteDTO newDipendente) {
+        return dipendenteService.findByIdAndUpdate(dipendente.getUsername(), newDipendente);
+    }
+
+    @DeleteMapping("/me")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteProfile(@AuthenticationPrincipal Dipendente dipendente) {
+        dipendenteService.deleteDipendente(dipendente.getUsername());
+    }
+
     @GetMapping("/{dipendenteId}")
     public Dipendente findById(@PathVariable String dipendenteId) {
         return dipendenteService.findById(dipendenteId);
@@ -34,11 +52,13 @@ public class DipendenteController {
 
 
     @PutMapping("/{dipendenteId}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public Dipendente findByIdAndUpdate(@PathVariable String dipendenteId, @RequestBody DipendenteDTO body) {
         return dipendenteService.findByIdAndUpdate(dipendenteId, body);
     }
 
     @DeleteMapping("/{dipendenteId}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteDipendente(@PathVariable String dipendenteId) {
         dipendenteService.deleteDipendente(dipendenteId);
